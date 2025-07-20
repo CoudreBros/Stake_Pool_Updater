@@ -103,4 +103,4 @@ Contributions are welcome. Feel free to open a pull request or issue.
 
 ## 📄 License
 
-MIT License © 2025 [Martin Kudr](https://github.com/<YOUR_USERNAME>)
+MIT License © 2025 [Stake Pool Updater Contributors](https://github.com/<YOUR_USERNAME>)
