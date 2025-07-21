@@ -17,7 +17,7 @@ SPU is suitable for **block producers** and **relay nodes** alike.
 The easiest way to install SPU is using the provided installer script:
 
 ```bash
-curl -sL https://github.com/CoudreBros/Stake_Pool_Updater/blob/main/SPU_Installer.sh | bash
+curl -sL https://raw.githubusercontent.com/CoudreBros/Stake_Pool_Updater/refs/heads/main/SPU_Installer.sh?token=GHSAT0AAAAAADHCFKANB2VCDDG5ODLG4CWW2D6QWLQ | bash
 ```
 
 Alternatively, you can manually clone the repository and run the installer:
