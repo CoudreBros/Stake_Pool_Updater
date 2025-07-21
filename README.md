@@ -40,6 +40,8 @@ The easiest way to install SPU is using the provided installer script:
 ```bash
 curl -sL https://raw.githubusercontent.com/CoudreBros/Stake_Pool_Updater/main/SPU_Installer.sh | bash
 ```
+By default, SPU will be installed to the $HOME/Stake_Pool_Updater directory.
+You can change this path by modifying the CLONE_DIR variable at the beginning of the installer script.
 
 Alternatively, you can manually clone the repository and run the installer:
 

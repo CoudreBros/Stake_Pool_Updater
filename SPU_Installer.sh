@@ -55,6 +55,9 @@ info "Installing Python requirements..."
 pip install --upgrade pip
 pip install -r requirements.txt || error "Failed to install dependencies."
 
+# === MAKE THE MAIN SHELL SCRIPT EXECUTABLE ===
+chmod +x "${CLONE_DIR}/stake_pool_updater.sh"
+
 # === CREATE .env IF MISSING ===
 if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
