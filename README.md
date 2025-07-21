@@ -18,13 +18,11 @@ Before installing or running the Stake Pool Updater (SPU), ensure your system me
 
 - ✅ Linux system (Debian-based recommended)
 - ✅ `git` (for cloning the repository)
-- ✅ `bash` shell
 - ✅ `curl` (for running the installer via URL)
 - ✅ `python3` (version 3.8+ recommended)
 - ✅ `pip` (Python package manager)
 - ✅ `venv` module (for creating isolated Python environments)
 - ✅ `wget`, `tar` and other standard Unix tools
-- ✅ `sudo` privileges (for installing/upgrading system-level binaries)
 
 You can install missing dependencies on Ubuntu/Debian using:
 
