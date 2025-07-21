@@ -12,6 +12,28 @@ SPU is suitable for **block producers** and **relay nodes** alike.
 
 ---
 
+## 📦 Requirements
+
+Before installing or running the Stake Pool Updater (SPU), ensure your system meets the following requirements:
+
+- ✅ Linux system (Debian-based recommended)
+- ✅ `git` (for cloning the repository)
+- ✅ `bash` shell
+- ✅ `curl` (for running the installer via URL)
+- ✅ `python3` (version 3.8+ recommended)
+- ✅ `pip` (Python package manager)
+- ✅ `venv` module (for creating isolated Python environments)
+- ✅ `wget`, `tar` and other standard Unix tools
+- ✅ `sudo` privileges (for installing/upgrading system-level binaries)
+
+You can install missing dependencies on Ubuntu/Debian using:
+
+```bash
+sudo apt update
+sudo apt install -y git curl python3 python3-pip python3-venv wget tar
+
+---
+
 ## 🚀 Installation
 
 The easiest way to install SPU is using the provided installer script:
@@ -27,15 +49,6 @@ git clone https://github.com/CoudreBros/Stake_Pool_Updater.git
 cd Stake_Pool_Updater
 ./SPU_installer.sh
 ```
-
----
-
-## 🧪 Requirements
-
-- Linux (Ubuntu/Debian recommended)
-- Python 3.8+
-- `systemd` and `sudo` access
-- Tools: `git`, `wget`, `ghcup`, `make`, `gcc`, etc.
 
 ---
 
