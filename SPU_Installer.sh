@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # === CONFIGURATION ===
-REPO_URL="${SPU_REPO_URL:-https://github.com/YOUR_USERNAME/Stake_Pool_Updater.git}"
+REPO_URL="${SPU_REPO_URL:-https://github.com/CoudreBros/Stake_Pool_Updater.git}"
 CLONE_DIR="${SPU_CLONE_DIR:-$HOME/Stake_Pool_Updater}"
 BRANCH="${SPU_BRANCH:-main}"
 PYTHON_BIN="${SPU_PYTHON:-python3}"

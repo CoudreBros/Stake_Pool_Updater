@@ -17,13 +17,13 @@ SPU is suitable for **block producers** and **relay nodes** alike.
 The easiest way to install SPU is using the provided installer script:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/couder82/Stake_Pool_Updater/main/SPU_installer.sh | bash
+curl -sL https://raw.githubusercontent.com/CoudreBros/Stake_Pool_Updater/main/SPU_installer.sh | bash
 ```
 
 Alternatively, you can manually clone the repository and run the installer:
 
 ```bash
-git clone https://github.com/couder82/Stake_Pool_Updater.git
+git clone https://github.com/CoudreBros/Stake_Pool_Updater.git
 cd Stake_Pool_Updater
 ./SPU_installer.sh
 ```
