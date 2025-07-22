@@ -54,6 +54,6 @@ def prompt_for_ghcup_tui():
     print(f"   Cabal: >= {cabal}")
 
     if ask_user_to_continue("\n🛠️  Do you want to launch ghcup tui to install them?"):
-    subprocess.run(["ghcup", "tui"])
+        subprocess.run(["ghcup", "tui"])
     else:
-    print("➡️  Skipping ghcup tui.")
+        print("➡️  Skipping ghcup tui.")
