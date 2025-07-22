@@ -138,9 +138,9 @@ def check_and_install_libs():
     for lib in missing:
         print(f" - {lib}")
 
-if not ask_user_to_continue("Do you want to install missing libraries now?"):
-    print("➡️  Skipping library installation.")
-    return
+    if not ask_user_to_continue("Do you want to install missing libraries now?"):
+        print("➡️  Skipping library installation.")
+        return
 
     if "libsodium" in missing:
         install_libsodium()
