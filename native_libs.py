@@ -1,5 +1,6 @@
 import os
 import subprocess
+from spu_helpers import ask_user_to_continue
 
 GIT_DIR = os.path.expanduser("~/git")
 
@@ -137,10 +138,9 @@ def check_and_install_libs():
     for lib in missing:
         print(f" - {lib}")
 
-    answer = input("\nDo you want to install missing libraries now? [y/N]: ").strip().lower()
-    if answer != 'y':
-        print("➡️  Skipping library installation.")
-        return
+if not ask_user_to_continue("Do you want to install missing libraries now?"):
+    print("➡️  Skipping library installation.")
+    return
 
     if "libsodium" in missing:
         install_libsodium()
