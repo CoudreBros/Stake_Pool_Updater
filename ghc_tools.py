@@ -3,6 +3,7 @@ import requests
 import subprocess
 import html
 from bs4 import BeautifulSoup
+from spu_helpers import ask_user_to_continue
 
 # === Načtení proměnných z prostředí ===
 CARDANO_INSTALL_GUIDE = os.getenv(
@@ -52,8 +53,7 @@ def prompt_for_ghcup_tui():
     print(f"   GHC:   >= {ghc}")
     print(f"   Cabal: >= {cabal}")
 
-    answer = input("\n🛠️  Do you want to launch ghcup tui to install them? [y/N]: ").strip().lower()
-    if answer == 'y':
-        subprocess.run(["ghcup", "tui"])
+    if ask_user_to_continue("\n🛠️  Do you want to launch ghcup tui to install them?"):
+    subprocess.run(["ghcup", "tui"])
     else:
-        print("➡️  Skipping ghcup tui.")
+    print("➡️  Skipping ghcup tui.")
