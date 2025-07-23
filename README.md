@@ -28,7 +28,8 @@ You can install missing dependencies on Ubuntu/Debian using:
 
 ```bash
 sudo apt update
-sudo apt install -y git curl python3 python3-pip python3-venv wget tar
+sudo apt install -y git curl python3 python3-pip python3-venv wget tar vimdiff
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 ```
 
 ---
