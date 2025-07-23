@@ -3,7 +3,7 @@
 **Stake Pool Updater (SPU)** is a modular, interactive tool for upgrading your Cardano stake pool infrastructure.  
 It streamlines the upgrade process as described in the [CoinCashew stake pool guide](https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-iv-administration/upgrading-a-node), including tasks such as:
 
-- Managing CNCLI
+- Managing CNCLI and gLiveView
 - Checking required native libraries (e.g., libsodium, secp256k1, blst)
 - Downloading and verifying updated config and genesis files
 - Upgrading `cardano-node` (via prebuilt binaries or from source)
