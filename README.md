@@ -104,7 +104,6 @@ You will be presented with an interactive main menu offering all supported opera
 
 - SPU **never runs external scripts silently** – all major steps require confirmation.
 - Existing binaries and config files are **safely backed up** before changes.
-- Designed with transparency and control in mind.
 
 ---
 
