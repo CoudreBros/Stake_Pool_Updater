@@ -78,13 +78,13 @@ CARDANO_NODE_INSTALL_DIR=/usr/local/bin
 CARDANO_CLI_INSTALL_DIR=/usr/local/bin
 
 # Directory where Cardano source will be cloned and built
-CARDANO_SOURCE_DIR=$HOME/git/cardano-node-src
+CARDANO_SOURCE_DIR=~/git/cardano-node-src
 
 # Directory to store backups of cardano-node and cardano-cli
-CARDANO_BACKUP_DIR=$HOME/backups-cardano-binaries
+CARDANO_BACKUP_DIR=~/backups-cardano-binaries
 
 # Path to your node configuration directory
-NODE_CONFIG_PATH=$HOME/cardano-my-node
+NODE_CONFIG_PATH=~/cardano-my-node
 
 # Name of the systemd service that runs your Cardano node
 CARDANO_SERVICE_NAME=cardano-node
