@@ -4,6 +4,7 @@
 It streamlines the upgrade process as described in the [CoinCashew stake pool guide](https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-iv-administration/upgrading-a-node), including tasks such as:
 
 - Managing CNCLI and gLiveView
+- Checking required GHC/Cabal version & launch ghcup tui
 - Checking required native libraries (e.g., libsodium, secp256k1, blst)
 - Downloading and verifying updated config and genesis files
 - Upgrading `cardano-node` (via prebuilt binaries or from source)
@@ -23,6 +24,7 @@ Before installing or running the Stake Pool Updater (SPU), ensure your system me
 - ✅ `pip` (Python package manager)
 - ✅ `venv` module (for creating isolated Python environments)
 - ✅ `wget`, `tar` and other standard Unix tools
+- ✅ `ghcup` for checking required GHC/Cabal version
 
 You can install missing dependencies on Ubuntu/Debian using:
 
