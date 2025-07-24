@@ -19,7 +19,7 @@ def ask_user_to_continue(question):
 def print_header(title: str):
     width = 50
     border = "=" * width
-    centered_title = f"= {title.center(width - 4)} ="
+    centered_title = f"| {title.center(width - 4)} |"
 
     print(border)
     print(centered_title)
