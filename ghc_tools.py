@@ -3,7 +3,7 @@ import requests
 import subprocess
 import html
 from bs4 import BeautifulSoup
-from spu_helpers import ask_user_to_continue
+from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
 # === Načtení proměnných z prostředí ===
 CARDANO_INSTALL_GUIDE = os.getenv(
@@ -47,6 +47,11 @@ def get_required_versions_official():
 
 def prompt_for_ghcup_tui():
     """Displays required versions and optionally launches ghcup tui."""
+
+    clear_terminal()
+    print_header ("Check required GHC/Cabal & launch ghcup tui")
+    print()
+
     ghc, cabal = get_required_versions_official()
 
     print("\n📌 Required versions from official Cardano documentation:")

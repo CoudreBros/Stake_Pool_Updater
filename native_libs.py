@@ -1,6 +1,6 @@
 import os
 import subprocess
-from spu_helpers import ask_user_to_continue
+from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
 GIT_DIR = os.path.expanduser("~/git")
 
@@ -128,6 +128,11 @@ Libs: -L${{libdir}} -lblst
 
 def check_and_install_libs():
     """Main logic for checking and optionally installing required libraries."""
+
+    clear_terminal()
+    print_header ("Check & install required native libraries")
+    print()
+
     missing = check_native_libs()
 
     if not missing:
