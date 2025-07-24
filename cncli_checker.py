@@ -1,6 +1,8 @@
 import os
 import subprocess
 import requests
+from spu_helpers import clear_terminal, print_header
+
 
 # === Load environment variables ===
 CNCLI_INSTALL_DIR = os.getenv("CNCLI_INSTALL_DIR", "/usr/local/bin")
@@ -52,7 +54,9 @@ def check_and_update_cncli():
     """Main logic to compare and update CNCLI if a newer version is available."""
     local_version = get_local_cncli_version()
     latest_version, latest_tag = get_latest_cncli_version()
-
+    
+    clear_terminal()
+    print_header ("Check & update CNCLI")
     print(f"Local CNCLI version:  {local_version}")
     print(f"Latest CNCLI version: {latest_version}\n")
 

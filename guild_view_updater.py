@@ -1,7 +1,7 @@
 import os
 import subprocess
 import shutil
-from spu_helpers import ask_user_to_continue
+from spu_helpers import ask_user_to_continue,header
 
 NODE_HOME = os.getenv("NODE_HOME", os.path.expanduser("~/cardano-my-node"))
 GLV_DIR = NODE_HOME
@@ -41,7 +41,8 @@ def launch_gLiveView():
     subprocess.run([GLV_SCRIPT])
 
 def run_gLiveView_updater():
-
+    print header()
+    
     if not ask_user_to_continue("Do you want to update Guild LiveView?"):
         print("➡️  Skipping Guild LiveView update.")
         return

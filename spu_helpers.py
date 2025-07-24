@@ -15,3 +15,12 @@ def ask_user_to_continue(question):
     )
     answer = prompt(f"{question} (y/n): ", validator=validator).strip().lower()
     return answer == "y"
+
+def print_header(title: str):
+    width = 38
+    border = "=" * width
+    centered_title = f"= {title.center(width - 4)} ="
+
+    print(border)
+    print(centered_title)
+    print(border)
