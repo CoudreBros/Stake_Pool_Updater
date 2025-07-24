@@ -41,8 +41,10 @@ def launch_gLiveView():
     subprocess.run([GLV_SCRIPT])
 
 def run_gLiveView_updater():
+    
     clear_terminal()
     print_header("Update Guild LiveView")
+    print("/n")
 
     if not ask_user_to_continue("Do you want to update Guild LiveView?"):
         print("➡️  Skipping Guild LiveView update.")

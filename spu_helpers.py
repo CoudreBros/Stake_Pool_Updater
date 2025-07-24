@@ -17,7 +17,7 @@ def ask_user_to_continue(question):
     return answer == "y"
 
 def print_header(title: str):
-    width = 38
+    width = 50
     border = "=" * width
     centered_title = f"= {title.center(width - 4)} ="
 

@@ -57,6 +57,7 @@ def check_and_update_cncli():
     
     clear_terminal()
     print_header ("Check & update CNCLI")
+    print("/n")
     print(f"Local CNCLI version:  {local_version}")
     print(f"Latest CNCLI version: {latest_version}\n")
 
