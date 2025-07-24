@@ -14,6 +14,7 @@ from guild_view_updater import run_gLiveView_updater
 from ghc_tools import prompt_for_ghcup_tui
 from native_libs import check_and_install_libs
 from config_updater import run_config_update
+from spu_helpers import clear_terminal, print_header
 
 
 # === Load configuration ===
@@ -26,14 +27,12 @@ menu_validator = Validator.from_callable(
     move_cursor_to_end=True,
 )
 
-def clear_terminal():
-    """Clear the terminal screen."""
-    subprocess.run(["clear"])
-
 def main_menu():
     while True:
         clear_terminal()
-        print("🛠️  Stake Pool Updater – Main Menu\n")
+        print_header("🛠️  Stake Pool Updater – Main Menu")
+        print()
+        
         print("1 - Check & update CNCLI")
         print("2 - Update Guild LiveView")
         print("3 - Check required GHC/Cabal & launch ghcup tui")
