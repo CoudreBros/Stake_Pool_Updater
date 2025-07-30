@@ -31,7 +31,7 @@ def print_warning():
     print("⚠️  Please read the following documentation carefully before proceeding:\n")
     print("🔗 CoinCashew guide:")
     print("   https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-iv-administration/upgrading-a-node#downloading-new-configuration-files")
-    print("🔗 Official Cardano Configurations:")
+    print("\n🔗 Official Cardano Configurations:")
     print("   https://book.play.dev.cardano.org/env-mainnet.html\n")
 
 def stop_cardano_node():

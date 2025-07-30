@@ -26,7 +26,7 @@ method_validator = Validator.from_callable(
 )
 
 def fetch_latest_version():
-    print("\n🔍 Checking latest Cardano Node version from GitHub...")
+    print("🔍 Checking latest Cardano Node version from GitHub...")
     try:
         response = requests.get(GITHUB_API_RELEASES)
         response.raise_for_status()
@@ -122,7 +122,7 @@ def run_node_upgrade():
         return
 
     installed_version = get_installed_version()
-    print(f"🧾 Installed version: {installed_version if installed_version else 'Not found'}")
+    print(f"\n🧾 Installed version: {installed_version if installed_version else 'Not found'}")
     print(f"🌐 Latest version:    {latest_version}")
 
     if installed_version == latest_version:
@@ -135,7 +135,7 @@ def run_node_upgrade():
             return
 
     print("\nChoose installation method:")
-    print("1 - Pre-built binaries from GitHub")
+    print("\n1 - Pre-built binaries from GitHub")
     print("2 - Compile from source")
     method = prompt("\nSelect method (1/2): ", validator=method_validator).strip()
 

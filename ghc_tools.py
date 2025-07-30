@@ -54,10 +54,10 @@ def prompt_for_ghcup_tui():
     ghc, cabal = get_required_versions_official()
 
     print("📌 Required versions from official Cardano documentation:")
-    print(f"   GHC:   >= {ghc}")
+    print(f"\n   GHC:   >= {ghc}")
     print(f"   Cabal: >= {cabal}")
 
     if ask_user_to_continue("\n🛠️  Do you want to launch ghcup tui to install them?"):
         subprocess.run(["ghcup", "tui"])
     else:
-        print("➡️  Skipping ghcup tui.")
+        print("\n➡️  Skipping ghcup tui.")
