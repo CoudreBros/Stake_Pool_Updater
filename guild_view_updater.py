@@ -7,7 +7,7 @@ from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 # Load environment variables
 load_dotenv()
 
-# GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
+GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
 GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
 ENV_FILE = os.path.join(GLIVEVIEW_DIR, "env")
 
@@ -18,8 +18,7 @@ def get_local_glivewiew_version():
     """Returns the locally installed gLiveView version (or None if not installed)."""
     try:
         result = subprocess.run([GLV_SCRIPT, "-v"], capture_output=True, text=True, check=True)
-        version = result.stdout.strip().split()[1].lstrip('v')
-        return version
+        return result.stdout.strip()
     except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
         print("⚠️  gLiveView is not installed or not found at the specified GLIVEVIEW_DIR.")
         return None
