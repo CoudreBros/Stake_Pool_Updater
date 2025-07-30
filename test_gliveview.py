@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Načti .env
 load_dotenv()
 
-GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
+GLIVEVIEW_DIR = os.path.expanduser(os.getenv("GLIVEVIEW_DIR"))
 GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
 
 print("===== gLiveView Diagnostic =====")
