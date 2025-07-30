@@ -10,11 +10,11 @@ from spu_helpers import ask_user_to_continue, print_header, clear_terminal
 # Load environment variables
 load_dotenv()
 
-CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME", "cardano-node")
-CARDANO_NODE_INSTALL_DIR = os.getenv("CARDANO_NODE_INSTALL_DIR", "/usr/local/bin")
-CARDANO_CLI_INSTALL_DIR = os.getenv("CARDANO_CLI_INSTALL_DIR", "/usr/local/bin")
-CARDANO_BACKUP_DIR = os.path.expanduser(os.getenv("CARDANO_BACKUP_DIR", "~/backups-cardano-binaries"))
-CARDANO_SOURCE_DIR = os.path.expanduser(os.getenv("CARDANO_SOURCE_DIR", "~/git/cardano-node-src"))
+CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME")
+CARDANO_NODE_INSTALL_DIR = os.getenv("CARDANO_NODE_INSTALL_DIR")
+CARDANO_CLI_INSTALL_DIR = os.getenv("CARDANO_CLI_INSTALL_DIR")
+CARDANO_BACKUP_DIR = os.path.expanduser(os.getenv("CARDANO_BACKUP_DIR"))
+CARDANO_SOURCE_DIR = os.path.expanduser(os.getenv("CARDANO_SOURCE_DIR"))
 
 GITHUB_API_RELEASES = "https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest"
 
