@@ -18,7 +18,8 @@ def get_local_glivewiew_version():
     """Returns the locally installed gLiveView version (or None if not installed)."""
     try:
         result = subprocess.run([GLV_SCRIPT, "-v"], capture_output=True, text=True, check=True)
-        return result.stdout.strip()
+        version = result.stdout.strip()
+        return version
     except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
         print("⚠️  gLiveView is not installed or not found at the specified GLIVEVIEW_DIR.")
         return None
