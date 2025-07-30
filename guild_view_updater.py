@@ -1,7 +1,7 @@
 import os
 import subprocess
 import shutil
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
 # Load environment variables
