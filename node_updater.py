@@ -122,16 +122,16 @@ def run_node_upgrade():
         return
 
     installed_version = get_installed_version()
-    print(f"\n🧾 Installed version: {installed_version if installed_version else 'Not found'}")
+    print(f"🧾 Installed version: {installed_version if installed_version else 'Not found'}")
     print(f"🌐 Latest version:    {latest_version}")
 
     if installed_version == latest_version:
-        print("✅ You already have the latest version.")
+        print("\n✅ You already have the latest version.")
         if not ask_user_to_continue("\nDo you still want to reinstall the current version?"):
             return
     else:
         if not ask_user_to_continue("\nDo you want to proceed with the upgrade?"):
-            print("⛔ Upgrade cancelled by user.")
+            print("\n⛔ Upgrade cancelled by user.")
             return
 
     print("\nChoose installation method:")
