@@ -3,13 +3,23 @@ import subprocess
 import shutil
 from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
-NODE_HOME = os.getenv("NODE_HOME", os.path.expanduser("~/cardano-my-node"))
-GLV_DIR = NODE_HOME
-GLV_SCRIPT = os.path.join(GLV_DIR, "gLiveView.sh")
-ENV_FILE = os.path.join(GLV_DIR, "env")
+
+GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
+GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
+ENV_FILE = os.path.join(GLIVEVIEW_DIR, "env")
 
 GLV_SCRIPT_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/gLiveView.sh"
 ENV_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/env"
+
+def get_local_glivewiew_version():
+    """Returns the locally installed gLiveWiew version (or None if not installed)."""
+    try:
+        result = subprocess.run(["gLiveView", "-v"], capture_output=True, text=True, check=True)
+        version = result.stdout.strip().split()[1].lstrip('v')
+        return version
+    except (subprocess.CalledProcessError, IndexError):
+        print("⚠️  gLiveView is not installed or not in PATH.")
+        return None
 
 def backup_existing_files():
     if os.path.exists(GLV_SCRIPT):
@@ -45,6 +55,8 @@ def run_gLiveView_updater():
     clear_terminal()
     print_header("Update Guild LiveView")
     print()
+
+    get_local_glivewiew_version()
 
     if not ask_user_to_continue("Do you want to update Guild LiveView?"):
         print("➡️  Skipping Guild LiveView update.")

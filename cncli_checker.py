@@ -5,7 +5,7 @@ from spu_helpers import clear_terminal, print_header
 
 
 # === Load environment variables ===
-CNCLI_INSTALL_DIR = os.getenv("CNCLI_INSTALL_DIR", "/usr/local/bin")
+CNCLI_INSTALL_DIR = os.getenv("CNCLI_INSTALL_DIR")
 CNCLI_GITHUB_API = os.getenv("CNCLI_GITHUB_API", "https://api.github.com/repos/cardano-community/cncli/releases/latest")
 CNCLI_DOWNLOAD_BASE = os.getenv("CNCLI_DOWNLOAD_BASE", "https://github.com/cardano-community/cncli/releases/download/")
 
