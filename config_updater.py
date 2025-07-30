@@ -69,7 +69,7 @@ def run_config_update():
     print_warning()
 
     if not ask_user_to_continue("Do you want to continue with stopping the Cardano node?"):
-        print("⛔ Operation cancelled by user.")
+        print("\n⛔ Operation cancelled by user.")
         return
 
     stop_cardano_node()
