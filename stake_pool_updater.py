@@ -62,9 +62,9 @@ def main_menu():
             print("❌ Invalid choice.")
 
         input("\nPress Enter to continue...")
-        
+
 if __name__ == "__main__":
     try:
         main_menu()
     except KeyboardInterrupt:
-        print("\\n👋 Program interrupted by user. Exiting...\\n")
+        print("\n👋 Program interrupted by user. Exiting...\n")
