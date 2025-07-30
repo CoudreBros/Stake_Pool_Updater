@@ -5,7 +5,7 @@ import shutil
 from dotenv import load_dotenv
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator
-from spu_helpers import ask_user_to_continue, clear_terminal
+from spu_helpers import ask_user_to_continue, print_header, clear_terminal
 
 # Load environment variables
 load_dotenv()
@@ -112,8 +112,10 @@ def install_from_source(latest_version):
     subprocess.run(["sudo", "cp", "-p", cli_path, f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli"])
 
 def run_node_upgrade():
+
     clear_terminal()
-    print("⚙️  Cardano Node Upgrade Wizard")
+    print_header("Upgrade cardano-node")
+    print()
 
     latest_version = fetch_latest_version()
     if not latest_version:

@@ -3,7 +3,7 @@ import requests
 import shutil
 import subprocess
 from dotenv import load_dotenv
-from spu_helpers import ask_user_to_continue, clear_terminal
+from spu_helpers import ask_user_to_continue, print_header, clear_terminal
 
 load_dotenv()
 
@@ -23,6 +23,11 @@ FILES_TO_UPDATE = [
 ]
 
 def print_warning():
+
+    clear_terminal()
+    print_header("Download and update Cardano configuration files")
+    print()
+
     print("⚠️  Please read the following documentation carefully before proceeding:\n")
     print("🔗 CoinCashew guide:")
     print("   https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-iv-administration/upgrading-a-node#downloading-new-configuration-files")
@@ -61,7 +66,6 @@ def compare_with_backup(filename):
         print(f"⚠️  Either {filename} or its backup not found – skipping diff.")
 
 def run_config_update():
-    clear_terminal()
     print_warning()
 
     if not ask_user_to_continue("Do you want to continue with stopping the Cardano node?"):
