@@ -82,7 +82,7 @@ def launch_gLiveView():
 
 
 # === Main function ===
-def check_and_update_gliveview():
+def run_gLiveView_updater():
     clear_terminal()
     print_header("Check & update Guild LiveView")
     print()
