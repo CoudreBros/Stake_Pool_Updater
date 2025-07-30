@@ -3,7 +3,6 @@ import subprocess
 import shutil
 from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
-
 GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
 GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
 ENV_FILE = os.path.join(GLIVEVIEW_DIR, "env")
@@ -12,13 +11,13 @@ GLV_SCRIPT_URL = "https://raw.githubusercontent.com/cardano-community/guild-oper
 ENV_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/env"
 
 def get_local_glivewiew_version():
-    """Returns the locally installed gLiveWiew version (or None if not installed)."""
+    """Returns the locally installed gLiveView version (or None if not installed)."""
     try:
-        result = subprocess.run(["gLiveView", "-v"], capture_output=True, text=True, check=True)
+        result = subprocess.run([GLV_SCRIPT, "-v"], capture_output=True, text=True, check=True)
         version = result.stdout.strip().split()[1].lstrip('v')
         return version
-    except (subprocess.CalledProcessError, IndexError):
-        print("⚠️  gLiveView is not installed or not in PATH.")
+    except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
+        print("⚠️  gLiveView is not installed or not found at the specified GLIVEVIEW_DIR.")
         return None
 
 def backup_existing_files():
