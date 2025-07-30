@@ -8,7 +8,7 @@ from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 load_dotenv()
 
 GLIVEVIEW_DIR = os.getenv("GLIVEVIEW_DIR")
-GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
+GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "./gLiveView.sh")
 ENV_FILE = os.path.join(GLIVEVIEW_DIR, "env")
 
 GLV_SCRIPT_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/gLiveView.sh"
