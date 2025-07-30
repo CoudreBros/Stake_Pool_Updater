@@ -5,12 +5,11 @@ import html
 from bs4 import BeautifulSoup
 from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 
-# === Načtení proměnných z prostředí ===
+# === Load variables ===
 CARDANO_INSTALL_GUIDE = os.getenv(
     "CARDANO_INSTALL_GUIDE",
     "https://developers.cardano.org/docs/get-started/cardano-node/installing-cardano-node"
 )
-
 
 def get_required_versions_official():
     """Scrapes Cardano install docs for required GHC and Cabal versions."""
@@ -54,7 +53,7 @@ def prompt_for_ghcup_tui():
 
     ghc, cabal = get_required_versions_official()
 
-    print("\n📌 Required versions from official Cardano documentation:")
+    print("📌 Required versions from official Cardano documentation:")
     print(f"   GHC:   >= {ghc}")
     print(f"   Cabal: >= {cabal}")
 
