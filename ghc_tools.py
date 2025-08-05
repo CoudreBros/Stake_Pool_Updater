@@ -8,7 +8,7 @@ from spu_helpers import ask_user_to_continue, clear_terminal, print_header
 # === Load variables ===
 CARDANO_INSTALL_GUIDE = os.getenv(
     "CARDANO_INSTALL_GUIDE",
-    "https://developers.cardano.org/docs/get-started/cardano-node/installing-cardano-node"
+    "https://developers.cardano.org/docs/operate-a-stake-pool/node-operations/installing-cardano-node"
 )
 
 def get_required_versions_official():
