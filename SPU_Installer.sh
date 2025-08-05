@@ -62,16 +62,15 @@ chmod +x "${CLONE_DIR}/stake_pool_updater.sh"
 if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp .env.example .env
-        warn ".env was created from .env.example. Please review it before running the updater."
+        warn "\n.env was created from .env.example. Please review it before running the updater."
     else
-        error "No .env or .env.example found in repository!"
+        error "\nNo .env or .env.example found in repository!"
     fi
 fi
 
 # === DEFAULT BEHAVIOR: NO AUTO RUN ===
 if [[ "$1" != "--run" ]]; then
-    info "✅ Installation complete."
-    echo -e "\n\033[1;31m❗ Please carefully check the variables in the .env file.\033[0m"
+    info "\n✅ Installation complete."
     echo -e "\n📦 To launch Stake Pool Updater manually:"
     echo "   cd \"$CLONE_DIR\""
     echo "   ./stake_pool_updater.sh"
