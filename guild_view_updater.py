@@ -55,11 +55,13 @@ def backup_existing_files():
 
 
 # === Download files ===
-def download_gLiveView_files():
+def download_gLiveView_script():
     print(f"⬇️  Downloading gLiveView.sh from:\n   {GLV_SCRIPT_URL}")
     subprocess.run(["curl", "-s", "-o", GLV_SCRIPT, GLV_SCRIPT_URL], check=True)
     print("✅ gLiveView.sh downloaded.")
 
+
+def download_env_file():
     print(f"⬇️  Downloading env from:\n   {ENV_URL}")
     subprocess.run(["curl", "-s", "-o", ENV_FILE, ENV_URL], check=True)
     print("✅ env downloaded.")
@@ -97,9 +99,15 @@ def run_gLiveView_updater():
         if ask_user_to_continue("🆕 Do you want to update gLiveView?"):
             try:
                 backup_existing_files()
-                download_gLiveView_files()
+                download_gLiveView_script()
                 subprocess.run(["chmod", "755", GLV_SCRIPT], check=True)
-                configure_env_file()
+
+                if ask_user_to_continue("⚠️  Do you also want to download and overwrite your env file?"):
+                    download_env_file()
+                    configure_env_file()
+                else:
+                    print("➡️  Skipping env file update.")
+
                 print("✅ gLiveView updated successfully.")
                 if ask_user_to_continue("Do you want to launch gLiveView now?"):
                     launch_gLiveView()
