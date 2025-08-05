@@ -2,6 +2,7 @@ import os
 import subprocess
 import requests
 import shutil
+import psutil
 from dotenv import load_dotenv
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator
@@ -46,6 +47,28 @@ def get_installed_version():
         pass
     return None
 
+def check_and_kill_cardano_node_process():
+    """Zkontroluje, zda běží nějaký proces cardano-node a nabídne jeho ukončení."""
+    running_pids = []
+    for proc in psutil.process_iter(['pid', 'name']):
+        if 'cardano-node' in proc.info['name']:
+            running_pids.append(proc.info['pid'])
+
+    if running_pids:
+        print(f"\n❗ Detected running cardano-node processes: {running_pids}")
+        if ask_user_to_continue("Do you want to kill these processes automatically?"):
+            for pid in running_pids:
+                try:
+                    psutil.Process(pid).terminate()
+                    print(f"✅ Terminated process with PID {pid}")
+                except Exception as e:
+                    print(f"❌ Failed to terminate PID {pid}: {e}")
+            print("⏳ Waiting for processes to exit...")
+            psutil.wait_procs([psutil.Process(pid) for pid in running_pids])
+        else:
+            print("⏸️  Please terminate the processes manually and rerun the upgrade.")
+            exit(1)
+
 def install_from_prebuilt(latest_version):
     print("\n📦 Installing from pre-built binaries...")
 
@@ -66,6 +89,8 @@ def install_from_prebuilt(latest_version):
     os.makedirs(CARDANO_BACKUP_DIR, exist_ok=True)
     subprocess.run(["sudo", "cp", f"{CARDANO_NODE_INSTALL_DIR}/cardano-node", f"{CARDANO_BACKUP_DIR}/cardano-node.bak"])
     subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"])
+
+    check_and_kill_cardano_node_process()
 
     print("\n🚚 Moving new binaries to installation directories...")
     subprocess.run(["sudo", "mv", "bin/cardano-node", CARDANO_NODE_INSTALL_DIR])
@@ -107,6 +132,8 @@ def install_from_source(latest_version):
     print("🚚 Installing new binaries...")
     node_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-node"], text=True).strip()
     cli_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"], text=True).strip()
+
+    check_and_kill_cardano_node_process()
 
     subprocess.run(["sudo", "cp", "-p", node_path, f"{CARDANO_NODE_INSTALL_DIR}/cardano-node"])
     subprocess.run(["sudo", "cp", "-p", cli_path, f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli"])
