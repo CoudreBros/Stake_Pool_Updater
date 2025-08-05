@@ -71,6 +71,7 @@ fi
 # === DEFAULT BEHAVIOR: NO AUTO RUN ===
 if [[ "$1" != "--run" ]]; then
     info "✅ Installation complete."
+    echo -e "\n\033[1;31m❗ Please carefully check the variables in the .env file.\033[0m"
     echo -e "\n📦 To launch Stake Pool Updater manually:"
     echo "   cd \"$CLONE_DIR\""
     echo "   ./stake_pool_updater.sh"
