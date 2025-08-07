@@ -1,5 +1,6 @@
 import os
 import subprocess
+import shutil
 from spu_helpers import ask_user_to_continue, clear_terminal, print_header, resolve_path
 
 GIT_DIR = resolve_path("GIT_DIR", default="~/git")
@@ -9,14 +10,12 @@ def check_lib_exists(libfile, headerfile):
     header_path = f"/usr/local/include/{headerfile}"
     return os.path.exists(lib_path) and os.path.exists(header_path)
 
-
 def check_lmdb_installed():
     try:
         subprocess.run(["dpkg", "-s", "liblmdb-dev"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         return True
     except subprocess.CalledProcessError:
         return False
-
 
 def install_lmdb():
     print("\n⬇️ Installing liblmdb-dev...")
@@ -27,6 +26,30 @@ def install_lmdb():
     except subprocess.CalledProcessError as e:
         print(f"❌ Failed to install liblmdb-dev: {e}")
 
+def safe_git_clone(repo_url, dest_folder_name):
+    """
+    Clones a git repository into GIT_DIR, deleting the folder if it already exists and user agrees.
+    """
+    dest_path = os.path.join(GIT_DIR, dest_folder_name)
+    if os.path.exists(dest_path):
+        print(f"\n⚠️  Folder '{dest_folder_name}' already exists in {GIT_DIR}.")
+        if ask_user_to_continue("Do you want to delete and clone again?"):
+            try:
+                shutil.rmtree(dest_path)
+                print(f"🧹 Deleted {dest_path}")
+            except Exception as e:
+                print(f"❌ Failed to delete folder: {e}")
+                return False
+        else:
+            print(f"⏭️  Skipping clone of {dest_folder_name}.")
+            return False
+
+    try:
+        subprocess.run(["git", "clone", repo_url], cwd=GIT_DIR, check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Git clone failed: {e}")
+        return False
 
 def check_native_libs():
     print("🔍 Checking required native libraries...\n")
@@ -55,9 +78,10 @@ def check_native_libs():
 
 def install_libsodium():
     print("\n⬇️ Installing libsodium...")
+    os.makedirs(GIT_DIR, exist_ok=True)
+    if not safe_git_clone("https://github.com/input-output-hk/libsodium", "libsodium"):
+        return
     try:
-        os.makedirs(GIT_DIR, exist_ok=True)
-        subprocess.run(["git", "clone", "https://github.com/input-output-hk/libsodium"], cwd=GIT_DIR, check=True)
         subprocess.run(["git", "checkout", "dbb48cc"], cwd=f"{GIT_DIR}/libsodium", check=True)
         subprocess.run(["./autogen.sh"], cwd=f"{GIT_DIR}/libsodium", check=True)
         subprocess.run(["./configure"], cwd=f"{GIT_DIR}/libsodium", check=True)
@@ -68,12 +92,12 @@ def install_libsodium():
     except subprocess.CalledProcessError as e:
         print(f"❌ libsodium install failed: {e}")
 
-
 def install_secp256k1():
     print("\n⬇️ Installing secp256k1...")
+    os.makedirs(GIT_DIR, exist_ok=True)
+    if not safe_git_clone("https://github.com/bitcoin-core/secp256k1", "secp256k1"):
+        return
     try:
-        os.makedirs(GIT_DIR, exist_ok=True)
-        subprocess.run(["git", "clone", "--depth", "1", "--branch", "v0.3.2", "https://github.com/bitcoin-core/secp256k1"], cwd=GIT_DIR, check=True)
         subprocess.run(["./autogen.sh"], cwd=f"{GIT_DIR}/secp256k1", check=True)
         subprocess.run(["./configure", "--enable-module-schnorrsig", "--enable-experimental"], cwd=f"{GIT_DIR}/secp256k1", check=True)
         subprocess.run(["make"], cwd=f"{GIT_DIR}/secp256k1", check=True)
@@ -84,12 +108,12 @@ def install_secp256k1():
     except subprocess.CalledProcessError as e:
         print(f"❌ secp256k1 install failed: {e}")
 
-
 def install_blst():
     print("\n⬇️ Installing blst...")
+    os.makedirs(GIT_DIR, exist_ok=True)
+    if not safe_git_clone("https://github.com/supranational/blst", "blst"):
+        return
     try:
-        os.makedirs(GIT_DIR, exist_ok=True)
-        subprocess.run(["git", "clone", "https://github.com/supranational/blst"], cwd=GIT_DIR, check=True)
         subprocess.run(["git", "checkout", "v0.3.11"], cwd=f"{GIT_DIR}/blst", check=True)
         subprocess.run(["./build.sh"], cwd=f"{GIT_DIR}/blst", check=True)
 
@@ -127,9 +151,8 @@ Libs: -L${{libdir}} -lblst
 
 def check_and_install_libs():
     """Main logic for checking and optionally installing required libraries."""
-
     clear_terminal()
-    print_header ("Check & install required native libraries")
+    print_header("Check & install required native libraries")
     print()
 
     missing = check_native_libs()
@@ -156,4 +179,3 @@ def check_and_install_libs():
         install_lmdb()
 
     print("\n➡️  Library installation completed.")
-
