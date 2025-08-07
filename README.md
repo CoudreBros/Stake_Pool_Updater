@@ -56,6 +56,7 @@ Alternatively, you can manually clone the repository and run the installer:
 ```bash
 git clone https://github.com/CoudreBros/Stake_Pool_Updater.git
 cd Stake_Pool_Updater
+chmod +x SPU_Installer.sh
 ./SPU_installer.sh
 ```
 
