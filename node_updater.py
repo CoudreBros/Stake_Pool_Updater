@@ -102,28 +102,62 @@ def install_from_prebuilt(latest_version):
     shutil.rmtree(tmp_dir)
 
 def install_from_source(latest_version):
+    """
+    Compile and install cardano-node from source.
+    Checks for existing directory, handles non-git folders,
+    and ensures binaries are safely replaced.
+    """
     print("\n🛠️  Compiling from source...")
 
-    # Remove libsodium-dev
-    subprocess.run(["sudo", "apt", "remove", "-y", "libsodium-dev"])
+    # 🧹 Remove system-wide libsodium-dev to avoid conflicts
+    subprocess.run(["sudo", "apt", "remove", "-y", "libsodium-dev"], check=False)
 
-    os.makedirs(os.path.dirname(CARDANO_SOURCE_DIR), exist_ok=True)
-    os.chdir(os.path.dirname(CARDANO_SOURCE_DIR))
+    # Ensure the parent directory exists
+    parent_dir = os.path.dirname(CARDANO_SOURCE_DIR)
+    os.makedirs(parent_dir, exist_ok=True)
 
-    print("📥 Cloning latest source code...")
-    subprocess.run(["git", "clone", "https://github.com/IntersectMBO/cardano-node.git", CARDANO_SOURCE_DIR])
+    # 🧠 Check if CARDANO_SOURCE_DIR exists
+    if os.path.exists(CARDANO_SOURCE_DIR):
+        git_folder = os.path.join(CARDANO_SOURCE_DIR, ".git")
+        if not os.path.exists(git_folder):
+            print(f"\n⚠️  The folder {CARDANO_SOURCE_DIR} already exists but is not a Git repository.")
+            if ask_user_to_continue("Do you want to delete this folder and clone a fresh copy?"):
+                try:
+                    shutil.rmtree(CARDANO_SOURCE_DIR)
+                    print(f"🧹 Deleted {CARDANO_SOURCE_DIR}")
+                except Exception as e:
+                    print(f"❌ Failed to delete folder: {e}")
+                    return
+            else:
+                print("⛔ Upgrade aborted. Please clean the folder manually and rerun.")
+                return
+        else:
+            print(f"📂 Using existing git repository in {CARDANO_SOURCE_DIR}")
+    else:
+        print(f"📥 Cloning latest source code into {CARDANO_SOURCE_DIR}...")
+        try:
+            subprocess.run(
+                ["git", "clone", "https://github.com/IntersectMBO/cardano-node.git", CARDANO_SOURCE_DIR],
+                check=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Git clone failed: {e}")
+            return
+
+    # Move into source directory
     os.chdir(CARDANO_SOURCE_DIR)
 
-    subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"])
-    subprocess.run(["git", "checkout", latest_version])
+    # 🌀 Pull latest tags & switch to target version
+    subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"], check=True)
+    subprocess.run(["git", "checkout", latest_version], check=True)
 
     print("⚙️  Running cabal configure...")
-    subprocess.run(["cabal", "update"])
-    subprocess.run(["cabal", "configure", "-O0"])
+    subprocess.run(["cabal", "update"], check=True)
+    subprocess.run(["cabal", "configure", "-O0"], check=True)
 
     print("🔧 Building binaries...")
-    subprocess.run(["cabal", "build", "all"])
-    subprocess.run(["cabal", "build", "cardano-cli"])
+    subprocess.run(["cabal", "build", "all"], check=True)
+    subprocess.run(["cabal", "build", "cardano-cli"], check=True)
 
     print("\n🔄 Backing up old binaries...")
     os.makedirs(CARDANO_BACKUP_DIR, exist_ok=True)
@@ -131,8 +165,13 @@ def install_from_source(latest_version):
     subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"])
 
     print("🚚 Installing new binaries...")
-    node_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-node"], text=True).strip()
-    cli_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"], text=True).strip()
+
+    try:
+        node_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-node"], text=True).strip()
+        cli_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"], text=True).strip()
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to locate built binaries: {e}")
+        return
 
     check_and_kill_cardano_node_process()
 
