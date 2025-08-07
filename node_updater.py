@@ -144,8 +144,11 @@ def install_from_source(latest_version):
             print(f"❌ Git clone failed: {e}")
             return
 
-    # Move into source directory
-    os.chdir(CARDANO_SOURCE_DIR)
+    try:
+        os.chdir(CARDANO_SOURCE_DIR)
+        print(f"✅ Current working directory: {os.getcwd()}")
+    except Exception as e:
+        print(f"❌ Failed to change directory to {CARDANO_SOURCE_DIR}: {e}")
 
     # 🌀 Pull latest tags & switch to target version
     subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"], check=True)
