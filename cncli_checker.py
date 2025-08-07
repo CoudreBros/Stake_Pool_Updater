@@ -1,6 +1,7 @@
 import os
 import subprocess
 import requests
+import shutil
 from spu_helpers import clear_terminal, print_header, resolve_path
 
 
@@ -9,17 +10,18 @@ CNCLI_INSTALL_DIR = resolve_path("CNCLI_INSTALL_DIR")
 CNCLI_GITHUB_API = os.getenv("CNCLI_GITHUB_API", "https://api.github.com/repos/cardano-community/cncli/releases/latest")
 CNCLI_DOWNLOAD_BASE = os.getenv("CNCLI_DOWNLOAD_BASE", "https://github.com/cardano-community/cncli/releases/download/")
 
-
 def get_local_cncli_version():
     """Returns the locally installed CNCLI version (or None if not installed)."""
+    if shutil.which("cncli") is None:
+        print("⚠️  CNCLI is not installed or not in PATH.")
+        return None
     try:
         result = subprocess.run(["cncli", "-V"], capture_output=True, text=True, check=True)
         version = result.stdout.strip().split()[1].lstrip('v')
         return version
     except (subprocess.CalledProcessError, IndexError):
-        print("⚠️  CNCLI is not installed or not in PATH.")
+        print("⚠️  Failed to detect CNCLI version.")
         return None
-
 
 def get_latest_cncli_version():
     """Fetches the latest CNCLI version and tag from GitHub."""
