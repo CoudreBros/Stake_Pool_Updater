@@ -1,9 +1,8 @@
 import os
 import subprocess
-from spu_helpers import ask_user_to_continue, clear_terminal, print_header
+from spu_helpers import ask_user_to_continue, clear_terminal, print_header, resolve_path
 
-GIT_DIR = os.path.expanduser("~/git")
-
+GIT_DIR = resolve_path("GIT_DIR")
 
 def check_lib_exists(libfile, headerfile):
     lib_path = f"/usr/local/lib/{libfile}"

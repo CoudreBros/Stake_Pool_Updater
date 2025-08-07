@@ -3,12 +3,12 @@ import requests
 import shutil
 import subprocess
 from dotenv import load_dotenv
-from spu_helpers import ask_user_to_continue, print_header, clear_terminal
+from spu_helpers import ask_user_to_continue, print_header, clear_terminal, resolve_path
 
 load_dotenv()
 
 # === Load environment variables ===
-NODE_CONFIG_PATH = os.path.expanduser(os.getenv("NODE_CONFIG_PATH", ""))
+NODE_CONFIG_PATH = resolve_path("NODE_CONFIG_PATH")
 CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME", "cardano-node")
 CARDANO_CONFIG_URL_BASE = "https://book.play.dev.cardano.org/environments/mainnet"
 IS_BLOCK_PRODUCER = os.getenv("IS_BLOCK_PRODUCER", "false").lower() == "true"

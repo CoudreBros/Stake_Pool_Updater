@@ -1,6 +1,8 @@
 import subprocess
+import os
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator
+
 
 def clear_terminal():
     """Clear the terminal screen."""
@@ -24,3 +26,10 @@ def print_header(title: str):
     print(border)
     print(centered_title)
     print(border)
+
+def resolve_path(varname, default=""):
+    """Resolve a path from environment variable with support for ~ and $HOME."""
+    raw_path = os.getenv(varname, default)
+    if not raw_path:
+        return None
+    return os.path.abspath(os.path.expandvars(os.path.expanduser(raw_path)))

@@ -4,18 +4,17 @@ import shutil
 import requests
 import re
 from dotenv import load_dotenv
-from spu_helpers import ask_user_to_continue, clear_terminal, print_header
+from spu_helpers import ask_user_to_continue, clear_terminal, print_header, resolve_path
 
 # === Load environment variables ===
 load_dotenv()
 
-GLIVEVIEW_DIR = os.path.expanduser(os.getenv("GLIVEVIEW_DIR"))
+GLIVEVIEW_DIR = resolve_path("GLIVEVIEW_DIR")
 GLV_SCRIPT = os.path.join(GLIVEVIEW_DIR, "gLiveView.sh")
 ENV_FILE = os.path.join(GLIVEVIEW_DIR, "env")
 
 GLV_SCRIPT_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/gLiveView.sh"
 ENV_URL = "https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/env"
-
 
 # === Local version detection ===
 def get_local_gliveview_version():

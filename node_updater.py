@@ -6,16 +6,17 @@ import psutil
 from dotenv import load_dotenv
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator
-from spu_helpers import ask_user_to_continue, print_header, clear_terminal
+from spu_helpers import ask_user_to_continue, print_header, clear_terminal, resolve_path
 
 # Load environment variables
 load_dotenv()
 
 CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME")
-CARDANO_NODE_INSTALL_DIR = os.getenv("CARDANO_NODE_INSTALL_DIR")
-CARDANO_CLI_INSTALL_DIR = os.getenv("CARDANO_CLI_INSTALL_DIR")
-CARDANO_BACKUP_DIR = os.path.expanduser(os.getenv("CARDANO_BACKUP_DIR"))
-CARDANO_SOURCE_DIR = os.path.expanduser(os.getenv("CARDANO_SOURCE_DIR"))
+CARDANO_NODE_INSTALL_DIR = resolve_path("CARDANO_NODE_INSTALL_DIR")
+CARDANO_CLI_INSTALL_DIR = resolve_path("CARDANO_CLI_INSTALL_DIR")
+CARDANO_BACKUP_DIR = resolve_path("CARDANO_BACKUP_DIR")
+CARDANO_SOURCE_DIR = resolve_path("CARDANO_SOURCE_DIR")
+GLIVEVIEW_DIR = resolve_path("GLIVEVIEW_DIR")
 
 GITHUB_API_RELEASES = "https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest"
 

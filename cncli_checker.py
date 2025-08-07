@@ -1,11 +1,11 @@
 import os
 import subprocess
 import requests
-from spu_helpers import clear_terminal, print_header
+from spu_helpers import clear_terminal, print_header, resolve_path
 
 
 # === Load environment variables ===
-CNCLI_INSTALL_DIR = os.getenv("CNCLI_INSTALL_DIR")
+CNCLI_INSTALL_DIR = resolve_path("CNCLI_INSTALL_DIR")
 CNCLI_GITHUB_API = os.getenv("CNCLI_GITHUB_API", "https://api.github.com/repos/cardano-community/cncli/releases/latest")
 CNCLI_DOWNLOAD_BASE = os.getenv("CNCLI_DOWNLOAD_BASE", "https://github.com/cardano-community/cncli/releases/download/")
 
