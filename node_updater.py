@@ -102,21 +102,13 @@ def install_from_prebuilt(latest_version):
     shutil.rmtree(tmp_dir)
 
 def install_from_source(latest_version):
-    """
-    Compile and install cardano-node from source.
-    Checks for existing directory, handles non-git folders,
-    and ensures binaries are safely replaced.
-    """
     print("\n🛠️  Compiling from source...")
 
-    # 🧹 Remove system-wide libsodium-dev to avoid conflicts
     subprocess.run(["sudo", "apt", "remove", "-y", "libsodium-dev"], check=False)
 
-    # Ensure the parent directory exists
     parent_dir = os.path.dirname(CARDANO_SOURCE_DIR)
     os.makedirs(parent_dir, exist_ok=True)
 
-    # 🧠 Check if CARDANO_SOURCE_DIR exists
     if os.path.exists(CARDANO_SOURCE_DIR):
         git_folder = os.path.join(CARDANO_SOURCE_DIR, ".git")
         if not os.path.exists(git_folder):
@@ -136,10 +128,7 @@ def install_from_source(latest_version):
     else:
         print(f"📥 Cloning latest source code into {CARDANO_SOURCE_DIR}...")
         try:
-            subprocess.run(
-                ["git", "clone", "https://github.com/IntersectMBO/cardano-node.git", CARDANO_SOURCE_DIR],
-                check=True
-            )
+            subprocess.run(["git", "clone", GITHUB_REPO_URL, CARDANO_SOURCE_DIR], check=True)
         except subprocess.CalledProcessError as e:
             print(f"❌ Git clone failed: {e}")
             return
@@ -149,9 +138,19 @@ def install_from_source(latest_version):
         print(f"✅ Current working directory: {os.getcwd()}")
     except Exception as e:
         print(f"❌ Failed to change directory to {CARDANO_SOURCE_DIR}: {e}")
+        return
 
-    # 🌀 Pull latest tags & switch to target version
-    subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"], check=True)
+    try:
+        subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"], check=True)
+    except subprocess.CalledProcessError as e:
+        if "would clobber existing tag" in str(e):
+            print("⚠️  Tag conflict detected. Attempting to delete local conflicting tags...")
+            subprocess.run(["git", "tag", "-d", latest_version], check=False)
+            subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags", "--force"], check=True)
+        else:
+            print(f"❌ Git fetch failed: {e}")
+            return
+
     subprocess.run(["git", "checkout", latest_version], check=True)
 
     print("⚙️  Running cabal configure...")
@@ -168,15 +167,12 @@ def install_from_source(latest_version):
     subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"])
 
     print("🚚 Installing new binaries...")
-
     try:
         node_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-node"], text=True).strip()
         cli_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"], text=True).strip()
     except subprocess.CalledProcessError as e:
         print(f"❌ Failed to locate built binaries: {e}")
         return
-
-    check_and_kill_cardano_node_process()
 
     subprocess.run(["sudo", "cp", "-p", node_path, f"{CARDANO_NODE_INSTALL_DIR}/cardano-node"])
     subprocess.run(["sudo", "cp", "-p", cli_path, f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli"])
