@@ -30,7 +30,7 @@ menu_validator = Validator.from_callable(
 def main_menu():
     while True:
         clear_terminal()
-        print_header("🛠️  Stake Pool Updater v. 1.0 – Main Menu")
+        print_header("🛠️  Stake Pool Updater 1.0.0-rc1 – Main Menu")
         print()
         
         print("1 - Check & update CNCLI")

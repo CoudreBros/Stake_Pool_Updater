@@ -11,6 +11,8 @@ It streamlines the upgrade process as described in the [CoinCashew stake pool gu
 
 SPU is suitable for **block producers** and **relay nodes** alike.
 
+Version 1.0.0-rc1 smoothly updates cardano-node to v10.5.1 and cardano-cli to v10.11.0.0.
+
 ---
 
 ## 📦 Requirements
@@ -112,17 +114,10 @@ You will be presented with an interactive main menu offering all supported opera
 
 - SPU **never runs external scripts silently** – all major steps require confirmation.
 - Existing binaries and config files are **safely backed up** before changes.
-
----
-
-## 🧑‍💻 For Developers
-
-SPU is modular by design. Each task is implemented as a separate Python module, making the project easy to extend or customize.
-
-Contributions are welcome. Feel free to open a pull request or issue.
+- SPU is modular by design. Each task is implemented as a separate Python module, making the project easy to extend or customize.
 
 ---
 
 ## 📄 License
 
-MIT License © 2025 Stake Pool Updater Contributors
+MIT License © 2025 CBROS Cardano Pool
