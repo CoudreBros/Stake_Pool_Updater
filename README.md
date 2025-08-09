@@ -118,7 +118,7 @@ You will be presented with an interactive main menu offering all supported opera
 
 ---
 
-## Feedback and Issues
+## 📝 Feedback and Issues
 
 This repository is maintained by a single contributor.  
 If you encounter a bug, have a suggestion, or would like to request a feature, please use the [Issues](../../issues) section to let me know.
