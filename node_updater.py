@@ -8,19 +8,20 @@ from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator
 from spu_helpers import ask_user_to_continue, print_header, clear_terminal, resolve_path
 
-# Load environment variables
+# === Load environment variables ===
 load_dotenv()
 
-CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME")
-CARDANO_NODE_INSTALL_DIR = resolve_path("CARDANO_NODE_INSTALL_DIR")
-CARDANO_CLI_INSTALL_DIR = resolve_path("CARDANO_CLI_INSTALL_DIR")
-CARDANO_BACKUP_DIR = resolve_path("CARDANO_BACKUP_DIR")
-CARDANO_SOURCE_DIR = resolve_path("CARDANO_SOURCE_DIR")
-GLIVEVIEW_DIR = resolve_path("GLIVEVIEW_DIR")
+CARDANO_SERVICE_NAME      = os.getenv("CARDANO_SERVICE_NAME")
+CARDANO_NODE_INSTALL_DIR  = resolve_path("CARDANO_NODE_INSTALL_DIR")
+CARDANO_CLI_INSTALL_DIR   = resolve_path("CARDANO_CLI_INSTALL_DIR")
+CARDANO_BACKUP_DIR        = resolve_path("CARDANO_BACKUP_DIR")
+CARDANO_SOURCE_DIR        = resolve_path("CARDANO_SOURCE_DIR")
+# GLIVEVIEW_DIR is not used here, so we don't need to resolve it
 
 GITHUB_API_RELEASES = "https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest"
+GITHUB_REPO_URL     = "https://github.com/IntersectMBO/cardano-node.git"
 
-# Prompt validator for method choice
+# === Prompt validator for method choice ===
 method_validator = Validator.from_callable(
     lambda text: text in ["1", "2"],
     error_message="Please enter 1 or 2",
@@ -30,9 +31,10 @@ method_validator = Validator.from_callable(
 def fetch_latest_version():
     print("🔍 Checking latest Cardano Node version from GitHub...")
     try:
-        response = requests.get(GITHUB_API_RELEASES)
+        response = requests.get(GITHUB_API_RELEASES, timeout=30)
         response.raise_for_status()
         data = response.json()
+        # data["tag_name"] e.g. "10.5.1" or "v10.5.1"
         return data["tag_name"]
     except Exception as e:
         print(f"❌ Failed to fetch version info: {e}")
@@ -49,26 +51,30 @@ def get_installed_version():
     return None
 
 def check_and_kill_cardano_node_process():
-    """Zkontroluje, zda běží nějaký proces cardano-node a nabídne jeho ukončení."""
+    """Check if any 'cardano-node' process is running and offer to terminate it."""
     running_pids = []
     for proc in psutil.process_iter(['pid', 'name']):
-        if 'cardano-node' in proc.info['name']:
+        if proc.info.get('name') and 'cardano-node' in proc.info['name']:
             running_pids.append(proc.info['pid'])
 
     if running_pids:
         print(f"\n❗ Detected running cardano-node processes: {running_pids}")
         if ask_user_to_continue("Do you want to kill these processes automatically?"):
+            to_wait = []
             for pid in running_pids:
                 try:
-                    psutil.Process(pid).terminate()
+                    p = psutil.Process(pid)
+                    p.terminate()
+                    to_wait.append(p)
                     print(f"✅ Terminated process with PID {pid}")
                 except Exception as e:
                     print(f"❌ Failed to terminate PID {pid}: {e}")
-            print("⏳ Waiting for processes to exit...")
-            psutil.wait_procs([psutil.Process(pid) for pid in running_pids])
+            if to_wait:
+                print("⏳ Waiting for processes to exit...")
+                psutil.wait_procs(to_wait, timeout=15)
         else:
             print("⏸️  Please terminate the processes manually and rerun the upgrade.")
-            exit(1)
+            raise SystemExit(1)
 
 def install_from_prebuilt(latest_version):
     print("\n📦 Installing from pre-built binaries...")
@@ -80,35 +86,105 @@ def install_from_prebuilt(latest_version):
     url = f"https://github.com/IntersectMBO/cardano-node/releases/download/{latest_version}/cardano-node-{latest_version}-linux.tar.gz"
 
     print(f"⬇️  Downloading {url}...")
-    subprocess.run(["wget", url])
+    subprocess.run(["wget", url], check=True)
 
     archive_name = f"cardano-node-{latest_version}-linux.tar.gz"
     print(f"📂 Extracting {archive_name}...")
-    subprocess.run(["tar", "-xvf", archive_name])
+    subprocess.run(["tar", "-xvf", archive_name], check=True)
 
     print("\n🔄 Backing up old binaries...")
     os.makedirs(CARDANO_BACKUP_DIR, exist_ok=True)
-    subprocess.run(["sudo", "cp", f"{CARDANO_NODE_INSTALL_DIR}/cardano-node", f"{CARDANO_BACKUP_DIR}/cardano-node.bak"])
-    subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"])
+    subprocess.run(["sudo", "cp", f"{CARDANO_NODE_INSTALL_DIR}/cardano-node", f"{CARDANO_BACKUP_DIR}/cardano-node.bak"], check=False)
+    subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"], check=False)
 
+    # Make sure nothing holds the binary
     check_and_kill_cardano_node_process()
 
     print("\n🚚 Moving new binaries to installation directories...")
-    subprocess.run(["sudo", "mv", "bin/cardano-node", CARDANO_NODE_INSTALL_DIR])
-    subprocess.run(["sudo", "mv", "bin/cardano-cli", CARDANO_CLI_INSTALL_DIR])
+    subprocess.run(["sudo", "mv", "bin/cardano-node", CARDANO_NODE_INSTALL_DIR], check=True)
+    subprocess.run(["sudo", "mv", "bin/cardano-cli", CARDANO_CLI_INSTALL_DIR], check=True)
 
     print("\n🧹 Cleaning up...")
     os.chdir(os.path.expanduser("~"))
-    shutil.rmtree(tmp_dir)
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+
+def _normalize_tag(tag):
+    """Return candidate tag names with/without 'v' prefix to maximize compatibility."""
+    if not tag:
+        return []
+    candidates = [tag]
+    if tag.startswith("v"):
+        candidates.append(tag[1:])
+    else:
+        candidates.append("v" + tag)
+    # de-duplicate while preserving order
+    seen = set()
+    uniq = []
+    for t in candidates:
+        if t not in seen:
+            seen.add(t)
+            uniq.append(t)
+    return uniq
+
+def _ensure_correct_origin():
+    """Ensure 'origin' remote points to the official IntersectMBO repo."""
+    try:
+        url = subprocess.check_output(["git", "remote", "get-url", "origin"], text=True).strip()
+    except subprocess.CalledProcessError:
+        url = ""
+    if url != GITHUB_REPO_URL:
+        print(f"ℹ️  Adjusting 'origin' remote URL to {GITHUB_REPO_URL}")
+        if url:
+            subprocess.run(["git", "remote", "set-url", "origin", GITHUB_REPO_URL], check=True)
+        else:
+            subprocess.run(["git", "remote", "add", "origin", GITHUB_REPO_URL], check=True)
+
+def _fetch_all_with_tags():
+    """Fetch all branches, tags and submodules, handle tag clobber issues."""
+    try:
+        subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags", "--prune", "--force"], check=True)
+    except subprocess.CalledProcessError as e:
+        # Try to recover from tag clobber problems by forcing again
+        if "clobber existing tag" in str(e).lower():
+            print("⚠️  Tag conflict detected. Retrying with forced fetch...")
+            subprocess.run(["git", "fetch", "--tags", "--force", "--prune"], check=True)
+        else:
+            raise
+
+def _tag_exists(tag):
+    """Return True if the tag exists locally."""
+    try:
+        # faster than listing all tags; verify returns 0 if found
+        subprocess.run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def _checkout_tag(tag):
+    """Checkout given tag (by name or refs/tags/<tag>) force-detached."""
+    # Prefer explicit tag ref
+    res = subprocess.run(["git", "-c", "advice.detachedHead=false", "checkout", "-f", f"tags/{tag}"])
+    if res.returncode == 0:
+        return True
+    # Fallback to bare tag name
+    res = subprocess.run(["git", "-c", "advice.detachedHead=false", "checkout", "-f", tag])
+    return res.returncode == 0
 
 def install_from_source(latest_version):
+    """
+    Compile and install cardano-node from source.
+    Handles directory creation, non-git folders, remote URL, tag fetching, checkout and build.
+    """
     print("\n🛠️  Compiling from source...")
 
+    # 🧹 Remove system-wide libsodium-dev to avoid conflicts
     subprocess.run(["sudo", "apt", "remove", "-y", "libsodium-dev"], check=False)
 
+    # Ensure the parent directory exists
     parent_dir = os.path.dirname(CARDANO_SOURCE_DIR)
     os.makedirs(parent_dir, exist_ok=True)
 
+    # Prepare repo directory
     if os.path.exists(CARDANO_SOURCE_DIR):
         git_folder = os.path.join(CARDANO_SOURCE_DIR, ".git")
         if not os.path.exists(git_folder):
@@ -133,6 +209,7 @@ def install_from_source(latest_version):
             print(f"❌ Git clone failed: {e}")
             return
 
+    # Enter repo
     try:
         os.chdir(CARDANO_SOURCE_DIR)
         print(f"✅ Current working directory: {os.getcwd()}")
@@ -140,19 +217,39 @@ def install_from_source(latest_version):
         print(f"❌ Failed to change directory to {CARDANO_SOURCE_DIR}: {e}")
         return
 
+    # Ensure correct remote and fetch tags/submodules
     try:
-        subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags"], check=True)
+        _ensure_correct_origin()
+        _fetch_all_with_tags()
     except subprocess.CalledProcessError as e:
-        if "would clobber existing tag" in str(e):
-            print("⚠️  Tag conflict detected. Attempting to delete local conflicting tags...")
-            subprocess.run(["git", "tag", "-d", latest_version], check=False)
-            subprocess.run(["git", "fetch", "--all", "--recurse-submodules", "--tags", "--force"], check=True)
-        else:
-            print(f"❌ Git fetch failed: {e}")
-            return
+        print(f"❌ Git fetch failed: {e}")
+        return
 
-    subprocess.run(["git", "checkout", latest_version], check=True)
+    # Normalize tag candidates (with/without 'v')
+    candidates = _normalize_tag(latest_version)
 
+    # If we already are on the desired commit, still proceed with build
+    checked_out = False
+    for tag in candidates:
+        if not _tag_exists(tag):
+            continue
+        if _checkout_tag(tag):
+            checked_out = True
+            break
+
+    if not checked_out:
+        # Tag might not exist locally (despite fetch) ⇒ list tags for debug and exit
+        try:
+            tags_list = subprocess.check_output(["git", "tag", "--list"], text=True)
+        except Exception:
+            tags_list = "(failed to list)"
+        print(f"❌ Could not checkout any of these tags: {candidates}\nAvailable tags:\n{tags_list}")
+        return
+
+    # Update submodules after checkout (cardano-node uses them)
+    subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
+
+    # Build with cabal
     print("⚙️  Running cabal configure...")
     subprocess.run(["cabal", "update"], check=True)
     subprocess.run(["cabal", "configure", "-O0"], check=True)
@@ -163,22 +260,24 @@ def install_from_source(latest_version):
 
     print("\n🔄 Backing up old binaries...")
     os.makedirs(CARDANO_BACKUP_DIR, exist_ok=True)
-    subprocess.run(["sudo", "cp", f"{CARDANO_NODE_INSTALL_DIR}/cardano-node", f"{CARDANO_BACKUP_DIR}/cardano-node.bak"])
-    subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"])
+    subprocess.run(["sudo", "cp", f"{CARDANO_NODE_INSTALL_DIR}/cardano-node", f"{CARDANO_BACKUP_DIR}/cardano-node.bak"], check=False)
+    subprocess.run(["sudo", "cp", f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli", f"{CARDANO_BACKUP_DIR}/cardano-cli.bak"], check=False)
 
     print("🚚 Installing new binaries...")
     try:
         node_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-node"], text=True).strip()
-        cli_path = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"], text=True).strip()
+        cli_path  = subprocess.check_output(["./scripts/bin-path.sh", "cardano-cli"],  text=True).strip()
     except subprocess.CalledProcessError as e:
         print(f"❌ Failed to locate built binaries: {e}")
         return
 
-    subprocess.run(["sudo", "cp", "-p", node_path, f"{CARDANO_NODE_INSTALL_DIR}/cardano-node"])
-    subprocess.run(["sudo", "cp", "-p", cli_path, f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli"])
+    # Make sure nothing holds the binary
+    check_and_kill_cardano_node_process()
+
+    subprocess.run(["sudo", "cp", "-p", node_path, f"{CARDANO_NODE_INSTALL_DIR}/cardano-node"], check=True)
+    subprocess.run(["sudo", "cp", "-p", cli_path,  f"{CARDANO_CLI_INSTALL_DIR}/cardano-cli"],  check=True)
 
 def run_node_upgrade():
-
     clear_terminal()
     print_header("Upgrade cardano-node")
     print()
@@ -193,7 +292,7 @@ def run_node_upgrade():
 
     if installed_version == latest_version:
         print("\n✅ You already have the latest version.")
-        if not ask_user_to_continue("\nDo you still want to reinstall the current version?"):
+        if not ask_user_to_continue("\nDo you still want to reinstall/build the current version from your chosen method?"):
             return
     else:
         if not ask_user_to_continue("\nDo you want to proceed with the upgrade?"):
@@ -205,7 +304,7 @@ def run_node_upgrade():
     print("2 - Compile from source")
     method = prompt("\nSelect method (1/2): ", validator=method_validator).strip()
 
-    subprocess.run(["sudo", "systemctl", "stop", f"{CARDANO_SERVICE_NAME}.service"])
+    subprocess.run(["sudo", "systemctl", "stop", f"{CARDANO_SERVICE_NAME}.service"], check=False)
 
     if method == "1":
         install_from_prebuilt(latest_version)
@@ -221,7 +320,7 @@ def run_node_upgrade():
 
     restart = prompt("\nDo you want to restart the Cardano node now? (y/n): ").strip().lower()
     if restart == "y":
-        subprocess.run(["sudo", "systemctl", "start", f"{CARDANO_SERVICE_NAME}.service"])
+        subprocess.run(["sudo", "systemctl", "start", f"{CARDANO_SERVICE_NAME}.service"], check=False)
         print("🚀 Cardano node restarted.")
     else:
         print("⏸️  Cardano node not restarted.")
