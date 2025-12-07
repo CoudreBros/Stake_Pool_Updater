@@ -114,7 +114,7 @@ def install_blst():
     if not safe_git_clone("https://github.com/supranational/blst", "blst"):
         return
     try:
-        subprocess.run(["git", "checkout", "v0.3.11"], cwd=f"{GIT_DIR}/blst", check=True)
+        subprocess.run(["git", "checkout", "v0.3.14"], cwd=f"{GIT_DIR}/blst", check=True)
         subprocess.run(["./build.sh"], cwd=f"{GIT_DIR}/blst", check=True)
 
         pc_content = f"""prefix=/usr/local
