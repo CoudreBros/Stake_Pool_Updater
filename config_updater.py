@@ -106,7 +106,7 @@ def run_config_update():
 - do : Get change from other file (Diff Obtain)
 - dp : Push change to other file (Diff Put)
 - :wq : Save and exit
-- :qa : Quit all without saving
+- :qa! : Quit all without saving
 """)
     input("Press Enter to begin comparing files...")
 
