@@ -12,6 +12,15 @@ DEFAULT_INSTALL_REFS = {
     "blst": "v0.3.14",
 }
 
+# apt packages required for cardano-node; liburing-dev, protobuf-compiler and
+# libsnappy-dev are new since node 10.7 (LSM/io_uring/protobuf support)
+APT_PACKAGES = [
+    "liblmdb-dev",
+    "liburing-dev",
+    "protobuf-compiler",
+    "libsnappy-dev",
+]
+
 
 def check_lib_exists(libfile, headerfile):
     lib_path = f"/usr/local/lib/{libfile}"
@@ -19,10 +28,10 @@ def check_lib_exists(libfile, headerfile):
     return os.path.exists(lib_path) and os.path.exists(header_path)
 
 
-def check_lmdb_installed():
+def check_apt_package(pkg):
     try:
         subprocess.run(
-            ["dpkg", "-s", "liblmdb-dev"],
+            ["dpkg", "-s", pkg],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             check=True,
@@ -46,27 +55,26 @@ def get_pkg_config_version(pkg_name):
         return None
 
 
-def get_lmdb_version():
+def get_apt_version(pkg):
     try:
-        version_output = subprocess.run(
-            ["dpkg-query", "-W", "-f=${Version}", "liblmdb-dev"],
+        return subprocess.run(
+            ["dpkg-query", "-W", "-f=${Version}", pkg],
             check=True,
             capture_output=True,
             text=True,
-        ).stdout.strip()
-        return version_output or None
+        ).stdout.strip() or None
     except subprocess.CalledProcessError:
         return None
 
 
-def install_lmdb():
-    print("\n⬇️ Installing liblmdb-dev...")
+def install_apt_package(pkg):
+    print(f"\n⬇️ Installing {pkg}...")
     try:
         subprocess.run(["sudo", "apt", "update"], check=True)
-        subprocess.run(["sudo", "apt", "install", "-y", "liblmdb-dev"], check=True)
-        print("✅ liblmdb-dev installed.")
+        subprocess.run(["sudo", "apt", "install", "-y", pkg], check=True)
+        print(f"✅ {pkg} installed.")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to install liblmdb-dev: {e}")
+        print(f"❌ Failed to install {pkg}: {e}")
 
 
 def safe_git_clone(repo_url, dest_folder_name):
@@ -98,7 +106,7 @@ def safe_git_clone(repo_url, dest_folder_name):
 def check_native_libs():
     print("🔍 Checking required native libraries...\n")
 
-    libs = [
+    compiled_libs = [
         ("libsodium", "libsodium.a", "sodium.h", "libsodium"),
         ("secp256k1", "libsecp256k1.a", "secp256k1.h", "libsecp256k1"),
         ("blst", "libblst.a", "blst.h", "libblst"),
@@ -106,19 +114,21 @@ def check_native_libs():
 
     results = []
 
-    for name, libfile, headerfile, pkg_name in libs:
+    for name, libfile, headerfile, pkg_name in compiled_libs:
         ok = check_lib_exists(libfile, headerfile)
         version = get_pkg_config_version(pkg_name) if ok else None
         status = "✅ Found" if ok else "❌ Missing"
         version_note = f" (version: {version})" if version else ""
-        print(f"{name:<12}: {status}{version_note}")
+        print(f"{name:<16}: {status}{version_note}")
         results.append({"name": name, "installed": ok, "version": version})
 
-    lmdb_ok = check_lmdb_installed()
-    lmdb_version = get_lmdb_version() if lmdb_ok else None
-    lmdb_status = "✅ Installed" if lmdb_ok else "❌ Missing"
-    print(f"{'liblmdb-dev':<12}: {lmdb_status}" + (f" (version: {lmdb_version})" if lmdb_version else ""))
-    results.append({"name": "liblmdb-dev", "installed": lmdb_ok, "version": lmdb_version})
+    for pkg in APT_PACKAGES:
+        ok = check_apt_package(pkg)
+        version = get_apt_version(pkg) if ok else None
+        status = "✅ Installed" if ok else "❌ Missing"
+        version_note = f" (version: {version})" if version else ""
+        print(f"{pkg:<16}: {status}{version_note}")
+        results.append({"name": pkg, "installed": ok, "version": version})
 
     return results
 
@@ -252,8 +262,9 @@ def check_and_install_libs():
                 install_secp256k1()
             if "blst" in missing:
                 install_blst()
-            if "liblmdb-dev" in missing:
-                install_lmdb()
+            for pkg in APT_PACKAGES:
+                if pkg in missing:
+                    install_apt_package(pkg)
             print("\n➡️  Missing libraries installed.")
         else:
             print("➡️  Skipping library installation.")
@@ -264,17 +275,15 @@ def check_and_install_libs():
             if not ask_user_to_continue(f"Reinstall {lib['name']} (current: {lib['version'] or 'unknown'})?"):
                 continue
 
-            ref = DEFAULT_INSTALL_REFS.get(lib["name"])
             if lib["name"] in ("libsodium", "secp256k1", "blst"):
-                ref = prompt_for_version(lib["name"], lib["version"], ref)
-
-            if lib["name"] == "libsodium":
-                install_libsodium(ref)
-            elif lib["name"] == "secp256k1":
-                install_secp256k1(ref)
-            elif lib["name"] == "blst":
-                install_blst(ref)
-            elif lib["name"] == "liblmdb-dev":
-                install_lmdb()
+                ref = prompt_for_version(lib["name"], lib["version"], DEFAULT_INSTALL_REFS.get(lib["name"]))
+                if lib["name"] == "libsodium":
+                    install_libsodium(ref)
+                elif lib["name"] == "secp256k1":
+                    install_secp256k1(ref)
+                elif lib["name"] == "blst":
+                    install_blst(ref)
+            elif lib["name"] in APT_PACKAGES:
+                install_apt_package(lib["name"])
 
     print("\n➡️  Library checks and updates completed.")
