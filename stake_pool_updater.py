@@ -36,7 +36,7 @@ def main_menu():
         print("1 - Check & update CNCLI")
         print("2 - Update Guild LiveView")
         print("3 - Check required GHC/Cabal & launch ghcup tui")
-        print("4 - Check & install required native libraries (libsodium, secp256k1, blst, lmdb library)")
+        print("4 - Check & install required native libraries (libsodium, secp256k1, blst, lmdb, liburing, protobuf-compiler, snappy)")
         print("5 - Download and update Cardano configuration files")
         print("6 - Upgrade cardano-node (choose method)")
         print("0 - Exit\n")
