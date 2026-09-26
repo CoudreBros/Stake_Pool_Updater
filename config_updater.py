@@ -11,10 +11,10 @@ load_dotenv()
 NODE_CONFIG_PATH = resolve_path("NODE_CONFIG_PATH")
 CARDANO_SERVICE_NAME = os.getenv("CARDANO_SERVICE_NAME", "cardano-node")
 CARDANO_CONFIG_URL_BASE = "https://book.play.dev.cardano.org/environments/mainnet"
-IS_BLOCK_PRODUCER = os.getenv("IS_BLOCK_PRODUCER", "false").lower() == "true"
 
-# === Filenames to update ===
+# === Filenames to update (same config.json for relay and block producer) ===
 FILES_TO_UPDATE = [
+    "config.json",
     "byron-genesis.json",
     "shelley-genesis.json",
     "alonzo-genesis.json",
@@ -75,9 +75,6 @@ def run_config_update():
     stop_cardano_node()
 
     if ask_user_to_continue("\nDo you want to back up current config and genesis files (.bak)?"):
-        config_file = "config-bp.json" if IS_BLOCK_PRODUCER else "config.json"
-        FILES_TO_UPDATE.insert(0, config_file)
-
         for filename in FILES_TO_UPDATE:
             path = os.path.join(NODE_CONFIG_PATH, filename)
             backup_file(path)

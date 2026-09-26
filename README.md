@@ -75,9 +75,6 @@ nano .env
 Key configuration variables:
 
 ```ini
-# Set to true if this node is a Block Producer; otherwise, set to false
-IS_BLOCK_PRODUCER=false
-
 # Where CNCLI will be installed
 CNCLI_INSTALL_DIR=/usr/local/bin
 
