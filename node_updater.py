@@ -1,4 +1,5 @@
 import os
+import platform
 import subprocess
 import requests
 import shutil
@@ -76,6 +77,15 @@ def check_and_kill_cardano_node_process():
             print("⏸️  Please terminate the processes manually and rerun the upgrade.")
             raise SystemExit(1)
 
+def _linux_asset_arch():
+    """Map the host architecture to the suffix used in cardano-node release asset names."""
+    machine = platform.machine().lower()
+    if machine in ("x86_64", "amd64"):
+        return "amd64"
+    if machine in ("aarch64", "arm64"):
+        return "arm64"
+    raise RuntimeError(f"Unsupported architecture for pre-built binaries: {machine}")
+
 def install_from_prebuilt(latest_version):
     print("\n📦 Installing from pre-built binaries...")
 
@@ -83,12 +93,13 @@ def install_from_prebuilt(latest_version):
     os.makedirs(tmp_dir, exist_ok=True)
     os.chdir(tmp_dir)
 
-    url = f"https://github.com/IntersectMBO/cardano-node/releases/download/{latest_version}/cardano-node-{latest_version}-linux.tar.gz"
+    arch = _linux_asset_arch()
+    archive_name = f"cardano-node-{latest_version}-linux-{arch}.tar.gz"
+    url = f"https://github.com/IntersectMBO/cardano-node/releases/download/{latest_version}/{archive_name}"
 
     print(f"⬇️  Downloading {url}...")
     subprocess.run(["wget", url], check=True)
 
-    archive_name = f"cardano-node-{latest_version}-linux.tar.gz"
     print(f"📂 Extracting {archive_name}...")
     subprocess.run(["tar", "-xvf", archive_name], check=True)
 
